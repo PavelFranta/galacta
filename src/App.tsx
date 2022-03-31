@@ -1,5 +1,7 @@
+import GameMenu from './pages/game-menu'
+
 function App() {
-  return <p className="text-red-600 text-9xl">galacta morenkos</p>
+  return <GameMenu />
 }
 
 export default App
