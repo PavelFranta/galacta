@@ -12,16 +12,16 @@ const GameMenu = ({ onClick }) => {
           className="border-2 p-4 font-semibold border-black hover:animate-pulse"
           onClick={onClick}
         >
-          𠘨乇山 厶卂从乇
+          NEW GAME
         </button>
         <button className="border-2 p-4 font-semibold border-black  hover:animate-pulse">
-          丅口尸 丂匚口尺乇
+          TOP SCORE*
         </button>
         <a
           className="border-2 p-4 font-semibold border-black no-underline text-center  hover:animate-pulse"
           href="https://www.youtube.com/watch?v=rMcEwaGz_64"
         >
-          乇乂工丅
+          EXIT
         </a>
       </div>
     </div>
