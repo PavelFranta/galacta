@@ -50,16 +50,38 @@ function Galacta() {
    }
   }
 
+  useEffect(() => {
+    const audio = new Audio('game.mp3')
+    audio.play()
+  }, [])
+
   
   useEffect(() => {
     const intervalId = setInterval(() => {
-     setActiveShots(activeShots
-      .filter(shot => shot.positionY > -4000)
-      .map(shot => {
-      return {positionX: shot?.positionX, positionY: shot?.positionY - 8}}))
+      if (activeShots.length) {
+        setActiveShots(activeShots
+         .filter(shot => shot.positionY > -1500)
+         .map(shot => {
+         return {positionX: shot?.positionX, positionY: shot?.positionY - 8}}))
+      }
    }, 10);
    return () => clearInterval(intervalId);
   }, [activeShots])
+
+  useEffect(() => {
+    hit()
+  }, [activeShots])
+  
+  const hit = () => {
+    activeShots.forEach(shot => {
+      activeAliens.forEach(alien => {
+        if (shot.positionX > alien.positionX && shot.positionX < alien.positionX + 64 && shot.positionY > alien.positionY  && shot.positionY < alien.positionY  + 64 ) {
+          setActiveAliens(activeAliens.filter(currentAlient => currentAlient !== alien))
+          setActiveShots(activeShots.filter(currentShot => currentShot !== shot))
+        }
+      })
+    })
+  }
 
   useEffect(() => {setActiveAliens([
     {positionX: 100, positionY: 20, alienName: 'alien3'},
@@ -121,8 +143,6 @@ function Galacta() {
    ])}, [])
 
   useEffect(() => {
-    // const audio = new Audio('game.mp3')
-    // audio.play()
     const intervalId = setInterval(() => {
       setActiveAliens(activeAliens
        .map(alien => {
