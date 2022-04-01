@@ -12,6 +12,8 @@ function Galacta() {
   const [positionY, setPositionY] = useState(height - height * .1)
   const [activeShots, setActiveShots] = useState([])
   const [activeAliens, setActiveAliens] = useState([])
+  const [aliensKilled, setAliensKilled] = useState(0)
+  const [shotsShooted, setshotsShooted] = useState(0)
   let pressedKey = useKeyboardReader()
 
   useEffect(() => {
@@ -42,6 +44,7 @@ function Galacta() {
         break;
       case 'Space':
         setActiveShots([...activeShots, {positionX: positionX + 30.5, positionY: positionY - 5}])
+        setshotsShooted(shotsShooted + 1)
         const audio = new Audio('shot.wav')
         audio.play()
         break;
@@ -76,14 +79,71 @@ function Galacta() {
     activeShots.forEach(shot => {
       activeAliens.forEach(alien => {
         if (shot.positionX > alien.positionX && shot.positionX < alien.positionX + 64 && shot.positionY > alien.positionY  && shot.positionY < alien.positionY  + 64 ) {
-          setActiveAliens(activeAliens.filter(currentAlient => currentAlient !== alien))
+          setActiveAliens(activeAliens.filter(currentAlien => currentAlien !== alien))
           setActiveShots(activeShots.filter(currentShot => currentShot !== shot))
+          setAliensKilled(aliensKilled + 1)
         }
       })
     })
   }
 
   useEffect(() => {setActiveAliens([
+    {positionX: 100, positionY: -300, alienName: 'alien3'},
+    {positionX: 200, positionY: -300, alienName: 'alien3'},
+    {positionX: 300, positionY: -300, alienName: 'alien3'},
+    {positionX: 400, positionY: -300, alienName: 'alien3'},
+    {positionX: 500, positionY: -300, alienName: 'alien3'},
+    {positionX: 600, positionY: -300, alienName: 'alien3'},
+    {positionX: 700, positionY: -300, alienName: 'alien3'},
+    {positionX: 800, positionY: -300, alienName: 'alien3'},
+    {positionX: 900, positionY: -300, alienName: 'alien3'},
+    {positionX: 1000, positionY: -300, alienName: 'alien3'},
+    {positionX: 1100, positionY: -300, alienName: 'alien3'},
+    {positionX: 1200, positionY: -300, alienName: 'alien3'},
+    {positionX: 1300, positionY: -300, alienName: 'alien3'},
+    {positionX: 1400, positionY: -300, alienName: 'alien3'},
+    {positionX: 100, positionY: -200, alienName: 'alien3'},
+    {positionX: 200, positionY: -200, alienName: 'alien'},
+    {positionX: 300, positionY: -200, alienName: 'alien'},
+    {positionX: 400, positionY: -200, alienName: 'alien'},
+    {positionX: 500, positionY: -200, alienName: 'alien'},
+    {positionX: 600, positionY: -200, alienName: 'alien'},
+    {positionX: 700, positionY: -200, alienName: 'alien'},
+    {positionX: 800, positionY: -200, alienName: 'alien'},
+    {positionX: 900, positionY: -200, alienName: 'alien'},
+    {positionX: 1000, positionY: -200, alienName: 'alien'},
+    {positionX: 1100, positionY: -200, alienName: 'alien'},
+    {positionX: 1200, positionY: -200, alienName: 'alien'},
+    {positionX: 1300, positionY: -200, alienName: 'alien'},
+    {positionX: 1400, positionY: -200, alienName: 'alien3'},
+    {positionX: 100, positionY: -100, alienName: 'alien3'},
+    {positionX: 200, positionY: -100, alienName: 'alien4'},
+    {positionX: 300, positionY: -100, alienName: 'alien4'},
+    {positionX: 400, positionY: -100, alienName: 'alien4'},
+    {positionX: 500, positionY: -100, alienName: 'alien4'},
+    {positionX: 600, positionY: -100, alienName: 'alien4'},
+    {positionX: 700, positionY: -100, alienName: 'alien4'},
+    {positionX: 800, positionY: -100, alienName: 'alien4'},
+    {positionX: 900, positionY: -100, alienName: 'alien4'},
+    {positionX: 1000, positionY: -100, alienName: 'alien4'},
+    {positionX: 1100, positionY: -100, alienName: 'alien4'},
+    {positionX: 1200, positionY: -100, alienName: 'alien4'},
+    {positionX: 1300, positionY: -100, alienName: 'alien4'},
+    {positionX: 1400, positionY: -100, alienName: 'alien3'},
+    {positionX: 100, positionY: -20, alienName: 'alien3'},
+    {positionX: 200, positionY: -20, alienName: 'alien2', pulse: true},
+    {positionX: 300, positionY: -20, alienName: 'alien2', pulse: true},
+    {positionX: 400, positionY: -20, alienName: 'alien2', pulse: true},
+    {positionX: 500, positionY: -20, alienName: 'alien2', pulse: true},
+    {positionX: 600, positionY: -20, alienName: 'alien2', pulse: true},
+    {positionX: 700, positionY: -20, alienName: 'alien2', pulse: true},
+    {positionX: 800, positionY: -20, alienName: 'alien2', pulse: true},
+    {positionX: 900, positionY: -20, alienName: 'alien2', pulse: true},
+    {positionX: 1000, positionY: -20, alienName: 'alien2', pulse: true},
+    {positionX: 1100, positionY: -20, alienName: 'alien2', pulse: true},
+    {positionX: 1200, positionY: -20, alienName: 'alien2', pulse: true},
+    {positionX: 1300, positionY: -20, alienName: 'alien2', pulse: true},
+    {positionX: 1400, positionY: -20, alienName: 'alien3'},
     {positionX: 100, positionY: 20, alienName: 'alien3'},
     {positionX: 200, positionY: 20, alienName: 'alien2', pulse: true},
     {positionX: 300, positionY: 20, alienName: 'alien2', pulse: true},
@@ -146,9 +206,9 @@ function Galacta() {
     const intervalId = setInterval(() => {
       setActiveAliens(activeAliens
        .map(alien => {
-       return {positionX: alien?.positionX, positionY: alien?.positionY + 2, alienName: alien?.alienName, pulse: alien?.pulse}
+       return {positionX: alien?.positionX, positionY: alien?.positionY + 5, alienName: alien?.alienName, pulse: alien?.pulse}
       }))
-    }, 1000);
+    }, 500);
     return () => clearInterval(intervalId);
   }, [activeAliens])
 
@@ -157,6 +217,10 @@ function Galacta() {
       <Rocket positionX={positionX} positionY={positionY} />
       {activeShots.map(shot => <Shot positionX={shot.positionX} positionY={shot.positionY} />)}
       {activeAliens.map(alien => <Alien positionX={alien.positionX} positionY={alien.positionY} alienName={alien.alienName} pulse={alien.pulse} />)}
+      <div className="text-white flex flex-col absolute bottom-0 right-100 p-4 text-xl">
+        <div>Score: {aliensKilled}</div>
+        <div>Shots: {shotsShooted}</div>
+       </div>
     </div>
   )
 }
