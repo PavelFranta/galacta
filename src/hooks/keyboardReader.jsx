@@ -5,13 +5,22 @@ const useKeyboardReader = () => {
 
   useEffect(() => {
     function handleResize(value) {
-      setPressedKey(value)
+      switch (value.code) {
+        case 'ArrowUp':
+        case 'ArrowDown':
+        case 'ArrowLeft':
+        case 'ArrowRight':
+        case 'Space':
+          setPressedKey(value)
+          break;     
+        default:
+          break;
+      }
     }
 
     window.addEventListener('keydown', handleResize)
     return () => window.removeEventListener('keydown', handleResize)
   }, [])
-
   return pressedKey
 }
 

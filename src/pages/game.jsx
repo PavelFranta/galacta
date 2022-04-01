@@ -5,38 +5,54 @@ import useWindowDimensions from '../hooks/windowDimensions'
 
 function Galacta() {
   const { height, width } = useWindowDimensions()
-  const [positionX, setPositionX] = useState(width)
-  const [positionY, setPositionY] = useState(height)
+
+  const [positionX, setPositionX] = useState(width - 64)
+  const [positionY, setPositionY] = useState(height - 64)
   let pressedKey = useKeyboardReader()
 
   useEffect(() => {
-    switch (pressedKey?.key) {
+    processMove(pressedKey?.code)
+  },[pressedKey])
+
+  const processMove = (keyCode) => {
+    switch (keyCode) {
       case 'ArrowRight':
-        setPositionX(positionX + 16)
+        if (positionX + 20 + 60 < width) {
+          setPositionX(positionX + 20)
+        }
         break;
       case 'ArrowLeft':
-        setPositionX(positionX - 16)
+        if (positionX - 20 > 0) {
+          setPositionX(positionX - 20)
+        }
       break;
       case 'ArrowUp':
-        setPositionY(positionY - 16)
+        if (positionY - 20 > 0) {
+          setPositionY(positionY - 20)
+        }
         break;
       case 'ArrowDown':
-        setPositionY(positionY + 16)
+        if (positionY + 20 + 64 < height) {
+          setPositionY(positionY + 20)
+        }
+        break;
+      case 'Space':
+          console.log('space');
         break;
       default:
         break;
-    }
-  },[pressedKey])
+   }
+  }
 
  useEffect(() => {
-   const audio = new Audio('game.mp3')
-   audio.play()
+  //  const audio = new Audio('game.mp3')
+  //  audio.play()
   }, [])
 
 
   return (
     <div className="w-full h-full bg-gray-900 relative">
-      <Rocket positionX={positionX / 2 - 64} positionY={positionY-(positionY * .1)} />
+      <Rocket positionX={positionX} positionY={positionY} />
     </div>
   )
 }
