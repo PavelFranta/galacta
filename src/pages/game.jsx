@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Alien from '../components/alien'
 import Rocket from '../components/rocket'
 import Shot from '../components/shot'
 import useKeyboardReader from '../hooks/keyboardReader'
@@ -10,6 +11,7 @@ function Galacta() {
   const [positionX, setPositionX] = useState(width / 2)
   const [positionY, setPositionY] = useState(height - height * .1)
   const [activeShots, setActiveShots] = useState([])
+  const [activeAliens, setActiveAliens] = useState([])
   let pressedKey = useKeyboardReader()
 
   useEffect(() => {
@@ -59,15 +61,82 @@ function Galacta() {
    return () => clearInterval(intervalId);
   }, [activeShots])
 
+  useEffect(() => {setActiveAliens([
+    {positionX: 100, positionY: 20, alienName: 'alien3'},
+    {positionX: 200, positionY: 20, alienName: 'alien2', pulse: true},
+    {positionX: 300, positionY: 20, alienName: 'alien2', pulse: true},
+    {positionX: 400, positionY: 20, alienName: 'alien2', pulse: true},
+    {positionX: 500, positionY: 20, alienName: 'alien2', pulse: true},
+    {positionX: 600, positionY: 20, alienName: 'alien2', pulse: true},
+    {positionX: 700, positionY: 20, alienName: 'alien2', pulse: true},
+    {positionX: 800, positionY: 20, alienName: 'alien2', pulse: true},
+    {positionX: 900, positionY: 20, alienName: 'alien2', pulse: true},
+    {positionX: 1000, positionY: 20, alienName: 'alien2', pulse: true},
+    {positionX: 1100, positionY: 20, alienName: 'alien2', pulse: true},
+    {positionX: 1200, positionY: 20, alienName: 'alien2', pulse: true},
+    {positionX: 1300, positionY: 20, alienName: 'alien2', pulse: true},
+    {positionX: 1400, positionY: 20, alienName: 'alien3'},
+    {positionX: 100, positionY: 100, alienName: 'alien3'},
+    {positionX: 200, positionY: 100, alienName: 'alien4'},
+    {positionX: 300, positionY: 100, alienName: 'alien4'},
+    {positionX: 400, positionY: 100, alienName: 'alien4'},
+    {positionX: 500, positionY: 100, alienName: 'alien4'},
+    {positionX: 600, positionY: 100, alienName: 'alien4'},
+    {positionX: 700, positionY: 100, alienName: 'alien4'},
+    {positionX: 800, positionY: 100, alienName: 'alien4'},
+    {positionX: 900, positionY: 100, alienName: 'alien4'},
+    {positionX: 1000, positionY: 100, alienName: 'alien4'},
+    {positionX: 1100, positionY: 100, alienName: 'alien4'},
+    {positionX: 1200, positionY: 100, alienName: 'alien4'},
+    {positionX: 1300, positionY: 100, alienName: 'alien4'},
+    {positionX: 1400, positionY: 100, alienName: 'alien3'},
+    {positionX: 100, positionY: 200, alienName: 'alien3'},
+    {positionX: 200, positionY: 200, alienName: 'alien'},
+    {positionX: 300, positionY: 200, alienName: 'alien'},
+    {positionX: 400, positionY: 200, alienName: 'alien'},
+    {positionX: 500, positionY: 200, alienName: 'alien'},
+    {positionX: 600, positionY: 200, alienName: 'alien'},
+    {positionX: 700, positionY: 200, alienName: 'alien'},
+    {positionX: 800, positionY: 200, alienName: 'alien'},
+    {positionX: 900, positionY: 200, alienName: 'alien'},
+    {positionX: 1000, positionY: 200, alienName: 'alien'},
+    {positionX: 1100, positionY: 200, alienName: 'alien'},
+    {positionX: 1200, positionY: 200, alienName: 'alien'},
+    {positionX: 1300, positionY: 200, alienName: 'alien'},
+    {positionX: 1400, positionY: 200, alienName: 'alien3'},
+    {positionX: 100, positionY: 300, alienName: 'alien3'},
+    {positionX: 200, positionY: 300, alienName: 'alien3'},
+    {positionX: 300, positionY: 300, alienName: 'alien3'},
+    {positionX: 400, positionY: 300, alienName: 'alien3'},
+    {positionX: 500, positionY: 300, alienName: 'alien3'},
+    {positionX: 600, positionY: 300, alienName: 'alien3'},
+    {positionX: 700, positionY: 300, alienName: 'alien3'},
+    {positionX: 800, positionY: 300, alienName: 'alien3'},
+    {positionX: 900, positionY: 300, alienName: 'alien3'},
+    {positionX: 1000, positionY: 300, alienName: 'alien3'},
+    {positionX: 1100, positionY: 300, alienName: 'alien3'},
+    {positionX: 1200, positionY: 300, alienName: 'alien3'},
+    {positionX: 1300, positionY: 300, alienName: 'alien3'},
+    {positionX: 1400, positionY: 300, alienName: 'alien3'},
+   ])}, [])
+
   useEffect(() => {
-    const audio = new Audio('game.mp3')
-    audio.play()
-  }, [])
+    // const audio = new Audio('game.mp3')
+    // audio.play()
+    const intervalId = setInterval(() => {
+      setActiveAliens(activeAliens
+       .map(alien => {
+       return {positionX: alien?.positionX, positionY: alien?.positionY + 2, alienName: alien?.alienName, pulse: alien?.pulse}
+      }))
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, [activeAliens])
 
   return (
     <div className="w-full h-full bg-gray-900 relative" id='battlefield'>
       <Rocket positionX={positionX} positionY={positionY} />
       {activeShots.map(shot => <Shot positionX={shot.positionX} positionY={shot.positionY} />)}
+      {activeAliens.map(alien => <Alien positionX={alien.positionX} positionY={alien.positionY} alienName={alien.alienName} pulse={alien.pulse} />)}
     </div>
   )
 }
