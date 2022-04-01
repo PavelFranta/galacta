@@ -6,8 +6,8 @@ import useWindowDimensions from '../hooks/windowDimensions'
 function Galacta() {
   const { height, width } = useWindowDimensions()
 
-  const [positionX, setPositionX] = useState(width - 64)
-  const [positionY, setPositionY] = useState(height - 64)
+  const [positionX, setPositionX] = useState(width / 2)
+  const [positionY, setPositionY] = useState(height - height * .1)
   let pressedKey = useKeyboardReader()
 
   useEffect(() => {
