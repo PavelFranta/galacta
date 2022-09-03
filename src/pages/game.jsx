@@ -16,6 +16,12 @@ function Galacta({ shouldDisplayGame }) {
   const ALIEN_AND_ROCKET_ICON_SIZE = 64
   const shotSound = new Audio('shot.wav')
   const hitSound = new Audio('hit.wav')
+  const winSound = new Audio('dominating.mp3')
+  const loseSound = new Audio('humiliation.mp3')
+  const monsterKillSound = new Audio('monsterkill.mp3')
+  const godlikeSound = new Audio('godlike.mp3')
+  const killingSpreeSound = new Audio('killing-spree.mp3')
+  const firstBloodSound = new Audio('first-blood.mp3')
 
   const [height, width] = useWindowDimensions()
   const [rocketPositionX, setRocketPositionX] = useState(width / 2)
@@ -31,7 +37,7 @@ function Galacta({ shouldDisplayGame }) {
   let pressedKey = useKeyboardReader()
 
   const restart = () => {
-    setActiveAliens(generateArmy(width, 1))
+    setActiveAliens(generateArmy(width, 3))
     setShotsShot(0)
     setAliensKilled(0)
     setWin(false)
@@ -55,8 +61,24 @@ function Galacta({ shouldDisplayGame }) {
           setActiveShots(
             activeShots.filter(currentShot => currentShot !== shot)
           )
+          if (aliensKilled === 0) {
+            firstBloodSound.play()
+          }
+
+          if (aliensKilled === 10) {
+            killingSpreeSound.play()
+          }
+
+          if (aliensKilled === 20) {
+            monsterKillSound.play()
+          }
+
+          if (aliensKilled === 30) {
+            godlikeSound.play()
+          }
           setAliensKilled(aliensKilled + 1)
           if (activeAliens.length === 1) {
+            winSound.play()
             setWin(true)
           }
         }
@@ -162,6 +184,7 @@ function Galacta({ shouldDisplayGame }) {
         alien => alien.positionY > height - ALIEN_AND_ROCKET_ICON_SIZE
       )
     ) {
+      loseSound.play()
       setLose(true)
     }
   }
