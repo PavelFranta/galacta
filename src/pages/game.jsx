@@ -16,6 +16,8 @@ function Galacta() {
   const [aliensKilled, setAliensKilled] = useState(0)
   const [shotsShooted, setshotsShooted] = useState(0)
   const [win, setWin] = useState(false)
+  const [pausedGame, setPausedGame] = useState(true)
+  
   let pressedKey = useKeyboardReader()
 
   useEffect(() => {
@@ -27,6 +29,7 @@ function Galacta() {
     setshotsShooted(0)
     setAliensKilled(0)
     setWin(false)
+    setPausedGame(false)
   }
 
   const processMove = keyCode => {
@@ -52,14 +55,18 @@ function Galacta() {
         }
         break
       case 'Space':
-        setActiveShots([
-          ...activeShots,
-          { positionX: positionX + 30.5, positionY: positionY - 5 },
-        ])
-        setshotsShooted(shotsShooted + 1)
-        const audio = new Audio('shot.wav')
-        audio.play()
+        if(!pausedGame) {
+          setActiveShots([
+            ...activeShots,
+            { positionX: positionX + 30.5, positionY: positionY - 5 },
+          ])
+          setshotsShooted(shotsShooted + 1)
+          const audio = new Audio('shot.wav')
+          audio.play()
+        }
         break
+      case 'Escape':
+        setPausedGame(!pausedGame)
       default:
         break
     }
@@ -79,9 +86,9 @@ function Galacta() {
             })
         )
       }
-    }, 10)
+    }, pausedGame ? 99999999 : 10)
     return () => clearInterval(intervalId)
-  }, [activeShots])
+  }, [activeShots, pausedGame])
 
   useEffect(() => {
     hit()
@@ -113,8 +120,6 @@ function Galacta() {
 
   useEffect(() => {
     setActiveAliens(aliensArmy)
-    const audio = new Audio('game.mp3')
-    audio.play()
   }, [])
 
   useEffect(() => {
@@ -129,12 +134,12 @@ function Galacta() {
           }
         })
       )
-    }, 100)
+    }, pausedGame ? 99999999 : 100)
     return () => clearInterval(intervalId)
-  }, [activeAliens])
+  }, [activeAliens, pausedGame])
 
   return (
-    <div className="w-full h-full bg-gray-900 relative" id="battlefield">
+    <div className="w-full h-full bg-gray-900 relative z-10" id="battlefield">
       {win && (
         <div className="text-white flex flex-col p-4 text-xl items-center gap-4">
           <div className="text-white text-8xl p-4">Vyhráls more</div>
@@ -142,6 +147,14 @@ function Galacta() {
           <div>Shots: {shotsShooted}</div>
           <button className="border border-white p-2 mt-4" onClick={restart}>
             ZNOVA
+          </button>
+        </div>
+      )}
+      {pausedGame && !win && (
+        <div className="text-white flex flex-col p-4 text-xl items-center gap-4 relative z-20 bg-gray-900 w-fit mx-auto border border-white">
+          <div className="text-white text-8xl p-4">PAUSE</div>
+          <button className="border border-white p-2 mt-4" onClick={() => setPausedGame(false)}>
+            Pokračovat
           </button>
         </div>
       )}

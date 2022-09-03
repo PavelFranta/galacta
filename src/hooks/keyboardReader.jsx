@@ -11,6 +11,7 @@ const useKeyboardReader = () => {
         case 'ArrowLeft':
         case 'ArrowRight':
         case 'Space':
+        case 'Escape':
           setPressedKey(value)
           break;     
         default:
