@@ -13,14 +13,17 @@ import useWindowDimensions from '../hooks/windowDimensions'
 import generateArmy from '../generators/aliensArmy'
 
 function Galacta({ shouldDisplayGame }) {
-  const { height, width } = useWindowDimensions()
+  const ALIEN_AND_ROCKET_ICON_SIZE = 64
+  const shotSound = new Audio('shot.wav')
+  const hitSound = new Audio('hit.wav')
 
-  const [positionX, setPositionX] = useState(width / 2)
-  const [positionY, setPositionY] = useState(height - height * 0.1)
+  const [height, width] = useWindowDimensions()
+  const [rocketPositionX, setRocketPositionX] = useState(width / 2)
+  const [rocketPositionY, setRocketPositionY] = useState(height - height * 0.1)
   const [activeShots, setActiveShots] = useState([])
   const [activeAliens, setActiveAliens] = useState([])
   const [aliensKilled, setAliensKilled] = useState(0)
-  const [shotsShot, setshotsShot] = useState(0)
+  const [shotsShot, setShotsShot] = useState(0)
   const [win, setWin] = useState(false)
   const [lose, setLose] = useState(false)
   const [pausedGame, setPausedGame] = useState(true)
@@ -29,22 +32,23 @@ function Galacta({ shouldDisplayGame }) {
 
   const restart = () => {
     setActiveAliens(generateArmy(width, 1))
-    setshotsShot(0)
+    setShotsShot(0)
     setAliensKilled(0)
     setWin(false)
     setLose(false)
     setPausedGame(false)
   }
 
-  const hit = () => {
+  const hitDetector = () => {
     activeShots.forEach(shot => {
       activeAliens.forEach(alien => {
         if (
           shot.positionX > alien.positionX &&
-          shot.positionX < alien.positionX + 64 &&
+          shot.positionX < alien.positionX + ALIEN_AND_ROCKET_ICON_SIZE &&
           shot.positionY > alien.positionY &&
-          shot.positionY < alien.positionY + 64
+          shot.positionY < alien.positionY + ALIEN_AND_ROCKET_ICON_SIZE
         ) {
+          hitSound.play()
           setActiveAliens(
             activeAliens.filter(currentAlien => currentAlien !== alien)
           )
@@ -60,7 +64,7 @@ function Galacta({ shouldDisplayGame }) {
     })
   }
 
-  const processMove = keyCode => {
+  const processUserInput = keyCode => {
     if (
       (!pausedGame && !win) ||
       (pausedGame && keyCode === 'Escape') ||
@@ -68,33 +72,19 @@ function Galacta({ shouldDisplayGame }) {
     ) {
       switch (keyCode) {
         case 'ArrowRight':
-          if (positionX + 20 + 60 < width) {
-            setPositionX(positionX + 30)
-          }
+          moveRight()
           break
         case 'ArrowLeft':
-          if (positionX - 20 > 0) {
-            setPositionX(positionX - 30)
-          }
+          moveLeft()
           break
         case 'ArrowUp':
-          if (positionY - 20 > 0) {
-            setPositionY(positionY - 30)
-          }
+          moveUp()
           break
         case 'ArrowDown':
-          if (positionY + 20 + 64 < height) {
-            setPositionY(positionY + 30)
-          }
+          moveDown()
           break
         case 'Space':
-          setActiveShots([
-            ...activeShots,
-            { positionX: positionX + 30.5, positionY: positionY - 5 },
-          ])
-          setshotsShot(shotsShot + 1)
-          const audio = new Audio('shot.wav')
-          audio.play()
+          fireNewShot()
           break
         case 'Escape':
           setPausedGame(!pausedGame)
@@ -106,6 +96,36 @@ function Galacta({ shouldDisplayGame }) {
           break
       }
     }
+  }
+
+  const moveRight = () => {
+    if (rocketPositionX + 20 + 60 < width) {
+      setRocketPositionX(rocketPositionX + 30)
+    }
+  }
+  const moveLeft = () => {
+    if (rocketPositionX - 20 > 0) {
+      setRocketPositionX(rocketPositionX - 30)
+    }
+  }
+  const moveUp = () => {
+    if (rocketPositionY - 20 > 0) {
+      setRocketPositionY(rocketPositionY - 30)
+    }
+  }
+  const moveDown = () => {
+    if (rocketPositionY + 20 + ALIEN_AND_ROCKET_ICON_SIZE < height) {
+      setRocketPositionY(rocketPositionY + 30)
+    }
+  }
+
+  const fireNewShot = () => {
+    setActiveShots([
+      ...activeShots,
+      { positionX: rocketPositionX + 30.5, positionY: rocketPositionY - 5 },
+    ])
+    setShotsShot(shotsShot + 1)
+    shotSound.play()
   }
 
   const shotsMoverMapping = () => {
@@ -137,7 +157,11 @@ function Galacta({ shouldDisplayGame }) {
   }
 
   const doesAlienBreakThru = () => {
-    if (activeAliens.some(alien => alien.positionY > height - 64)) {
+    if (
+      activeAliens.some(
+        alien => alien.positionY > height - ALIEN_AND_ROCKET_ICON_SIZE
+      )
+    ) {
       setLose(true)
     }
   }
@@ -148,11 +172,11 @@ function Galacta({ shouldDisplayGame }) {
   }, [])
 
   useEffect(() => {
-    processMove(pressedKey?.code)
+    processUserInput(pressedKey?.code)
   }, [pressedKey])
 
   useEffect(() => {
-    hit()
+    hitDetector()
     const interval = setInterval(
       () => {
         if (activeShots.length) {
@@ -198,7 +222,10 @@ function Galacta({ shouldDisplayGame }) {
           setPausedGame={setPausedGame}
         />
       )}
-      <Rocket positionX={positionX} positionY={positionY} />
+      <Rocket
+        rocketPositionX={rocketPositionX}
+        rocketPositionY={rocketPositionY}
+      />
       {activeShots.map((shot, index) => (
         <Shot
           positionX={shot.positionX}

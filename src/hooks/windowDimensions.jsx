@@ -22,7 +22,7 @@ const useWindowDimensions = () => {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  return windowDimensions
+  return [windowDimensions.height, windowDimensions.width]
 }
 
 export default useWindowDimensions
