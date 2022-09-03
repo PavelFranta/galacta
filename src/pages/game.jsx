@@ -26,10 +26,13 @@ function Galacta({ shouldDisplayGame }) {
   const [killingSpreeSound] = useSound('killing-spree.mp3')
   const [firstBloodSound] = useSound('first-blood.mp3')
   const [holyShitSound] = useSound('holy-shit.mp3')
+  const [idiotSound] = useSound('idiot.mp3')
 
-  const [height, width] = useWindowDimensions()
-  const [rocketPositionX, setRocketPositionX] = useState(width / 2)
-  const [rocketPositionY, setRocketPositionY] = useState(height - height * 0.1)
+  const [screenHeight, screenWidth] = useWindowDimensions()
+  const [rocketPositionX, setRocketPositionX] = useState(screenWidth / 2)
+  const [rocketPositionY, setRocketPositionY] = useState(
+    screenHeight - screenHeight * 0.1
+  )
   const [activeShots, setActiveShots] = useState([])
   const [activeAliens, setActiveAliens] = useState([])
   const [aliensKilled, setAliensKilled] = useState(0)
@@ -41,7 +44,7 @@ function Galacta({ shouldDisplayGame }) {
   let pressedKey = useKeyboardReader()
 
   const restart = () => {
-    setActiveAliens(generateArmy(width, 3))
+    setActiveAliens(generateArmy(screenWidth, 3))
     setShotsShot(0)
     setAliensKilled(0)
     setWin(false)
@@ -143,7 +146,7 @@ function Galacta({ shouldDisplayGame }) {
   }
 
   const moveRight = () => {
-    if (rocketPositionX + 20 + 60 < width) {
+    if (rocketPositionX + 20 + 60 < screenWidth) {
       setRocketPositionX(rocketPositionX + 30)
     }
   }
@@ -158,7 +161,7 @@ function Galacta({ shouldDisplayGame }) {
     }
   }
   const moveDown = () => {
-    if (rocketPositionY + 20 + ALIEN_AND_ROCKET_ICON_SIZE < height) {
+    if (rocketPositionY + 20 + ALIEN_AND_ROCKET_ICON_SIZE < screenHeight) {
       setRocketPositionY(rocketPositionY + 30)
     }
   }
@@ -203,7 +206,7 @@ function Galacta({ shouldDisplayGame }) {
   const doesAlienBreakThru = () => {
     if (
       activeAliens.some(
-        alien => alien.positionY > height - ALIEN_AND_ROCKET_ICON_SIZE
+        alien => alien.positionY > screenHeight - ALIEN_AND_ROCKET_ICON_SIZE
       )
     ) {
       loseSoundTwo()
@@ -212,7 +215,7 @@ function Galacta({ shouldDisplayGame }) {
   }
 
   useEffect(() => {
-    setActiveAliens(generateArmy(width, 3))
+    setActiveAliens(generateArmy(screenWidth, 3))
     setPausedGame(false)
   }, [])
 
@@ -246,51 +249,68 @@ function Galacta({ shouldDisplayGame }) {
   }, [activeAliens, pausedGame])
 
   return (
-    <div className="w-full h-full bg-gray-900 relative z-10">
-      {win && (
-        <Win
-          aliensKilled={aliensKilled}
-          shotsShot={shotsShot}
-          restart={restart}
-        />
+    <>
+      {screenWidth >= 580 && (
+        <div className="w-full h-full bg-gray-900 relative z-10">
+          {win && (
+            <Win
+              aliensKilled={aliensKilled}
+              shotsShot={shotsShot}
+              restart={restart}
+            />
+          )}
+          {lose && (
+            <Lose
+              aliensKilled={aliensKilled}
+              shotsShot={shotsShot}
+              restart={restart}
+            />
+          )}
+          {pausedGame && !win && (
+            <Pause
+              shouldDisplayGame={shouldDisplayGame}
+              setPausedGame={setPausedGame}
+            />
+          )}
+          <Rocket
+            rocketPositionX={rocketPositionX}
+            rocketPositionY={rocketPositionY}
+          />
+          {activeShots.map((shot, index) => (
+            <Shot
+              positionX={shot.positionX}
+              positionY={shot.positionY}
+              key={index + 'shot'}
+            />
+          ))}
+          {activeAliens.map((alien, index) => (
+            <Alien
+              positionX={alien.positionX}
+              positionY={alien.positionY}
+              alienName={alien.alienName}
+              pulse={alien.pulse}
+              key={index + 'alien'}
+            />
+          ))}
+          {!win && (
+            <InGameScore aliensKilled={aliensKilled} shotsShot={shotsShot} />
+          )}
+        </div>
       )}
-      {lose && (
-        <Lose
-          aliensKilled={aliensKilled}
-          shotsShot={shotsShot}
-          restart={restart}
-        />
+      {screenWidth < 580 && (
+        <div className="h-full flex items-center justify-center flex-col">
+          <h1 className="text-2xl text-center">
+            Na mobilu to hrát nebudeš more !!!
+          </h1>
+          <button
+            className="mt-8 border-2 border-black p-4"
+            onClick={() => idiotSound()}
+          >
+            Udělit pokání
+          </button>
+        </div>
       )}
-      {pausedGame && !win && (
-        <Pause
-          shouldDisplayGame={shouldDisplayGame}
-          setPausedGame={setPausedGame}
-        />
-      )}
-      <Rocket
-        rocketPositionX={rocketPositionX}
-        rocketPositionY={rocketPositionY}
-      />
-      {activeShots.map((shot, index) => (
-        <Shot
-          positionX={shot.positionX}
-          positionY={shot.positionY}
-          key={index + 'shot'}
-        />
-      ))}
-      {activeAliens.map((alien, index) => (
-        <Alien
-          positionX={alien.positionX}
-          positionY={alien.positionY}
-          alienName={alien.alienName}
-          pulse={alien.pulse}
-          key={index + 'alien'}
-        />
-      ))}
-      {!win && (
-        <InGameScore aliensKilled={aliensKilled} shotsShot={shotsShot} />
-      )}
-    </div>
+    </>
   )
 }
 
