@@ -2,9 +2,14 @@ import { useState, useEffect } from 'react'
 import Alien from '../components/alien'
 import Rocket from '../components/rocket'
 import Shot from '../components/shot'
+import Pause from '../components/banners/pause'
+import Win from '../components/banners/win'
+
 import useKeyboardReader from '../hooks/keyboardReader'
 import useWindowDimensions from '../hooks/windowDimensions'
+
 import generateArmy from '../generators/aliensArmy'
+import InGameScore from '../components/banners/ingame-score'
 
 function Galacta({ shouldDisplayGame }) {
   const { height, width } = useWindowDimensions()
@@ -14,7 +19,7 @@ function Galacta({ shouldDisplayGame }) {
   const [activeShots, setActiveShots] = useState([])
   const [activeAliens, setActiveAliens] = useState([])
   const [aliensKilled, setAliensKilled] = useState(0)
-  const [shotsShooted, setshotsShooted] = useState(0)
+  const [shotsShot, setshotsShot] = useState(0)
   const [win, setWin] = useState(false)
   const [pausedGame, setPausedGame] = useState(true)
 
@@ -26,7 +31,7 @@ function Galacta({ shouldDisplayGame }) {
 
   const restart = () => {
     setActiveAliens(generateArmy(width, 1))
-    setshotsShooted(0)
+    setshotsShot(0)
     setAliensKilled(0)
     setWin(false)
     setPausedGame(false)
@@ -64,7 +69,7 @@ function Galacta({ shouldDisplayGame }) {
             ...activeShots,
             { positionX: positionX + 30.5, positionY: positionY - 5 },
           ])
-          setshotsShooted(shotsShooted + 1)
+          setshotsShot(shotsShot + 1)
           const audio = new Audio('shot.wav')
           audio.play()
           break
@@ -81,6 +86,7 @@ function Galacta({ shouldDisplayGame }) {
   }
 
   useEffect(() => {
+    hit()
     const intervalId = setInterval(
       () => {
         if (activeShots.length) {
@@ -94,16 +100,14 @@ function Galacta({ shouldDisplayGame }) {
                 }
               })
           )
+        } else {
+          clearInterval(intervalId)
         }
       },
       pausedGame ? 99999999 : 10
     )
     return () => clearInterval(intervalId)
   }, [activeShots, pausedGame])
-
-  useEffect(() => {
-    hit()
-  }, [activeShots])
 
   const hit = () => {
     activeShots.forEach(shot => {
@@ -154,38 +158,19 @@ function Galacta({ shouldDisplayGame }) {
   }, [activeAliens, pausedGame])
 
   return (
-    <div className="w-full h-full bg-gray-900 relative z-10" id="battlefield">
+    <div className="w-full h-full bg-gray-900 relative z-10">
       {win && (
-        <div className="text-white flex flex-col p-4 text-xl items-center gap-4">
-          <div className="text-white text-8xl p-4">Vyhráls more</div>
-          <div>Score: {aliensKilled}</div>
-          <div>Shots: {shotsShooted}</div>
-          <button
-            className="border border-white p-2 mt-4"
-            onClick={() => restart}
-          >
-            ZNOVA
-          </button>
-        </div>
+        <Win
+          aliensKilled={aliensKilled}
+          shotsShot={shotsShot}
+          restart={restart}
+        />
       )}
       {pausedGame && !win && (
-        <div className="text-white flex flex-col p-4 text-xl items-center gap-4 relative z-20 bg-gray-900 w-fit mx-auto border border-white">
-          <div className="text-white text-8xl p-4">PAUSE</div>
-          <div className="flex flex-col">
-            <button
-              className="border border-white p-2 mt-4"
-              onClick={() => setPausedGame(false)}
-            >
-              Pokračovat
-            </button>
-            <button
-              className="border border-white p-2 mt-4"
-              onClick={() => shouldDisplayGame(false)}
-            >
-              Hlavní menu
-            </button>
-          </div>
-        </div>
+        <Pause
+          shouldDisplayGame={shouldDisplayGame}
+          setPausedGame={setPausedGame}
+        />
       )}
       <Rocket positionX={positionX} positionY={positionY} />
       {activeShots.map((shot, index) => (
@@ -205,10 +190,7 @@ function Galacta({ shouldDisplayGame }) {
         />
       ))}
       {!win && (
-        <div className="text-white flex flex-col absolute bottom-0 right-100 p-4 text-xl z-10">
-          <div>Score: {aliensKilled}</div>
-          <div>Shots: {shotsShooted}</div>
-        </div>
+        <InGameScore aliensKilled={aliensKilled} shotsShot={shotsShot} />
       )}
     </div>
   )
