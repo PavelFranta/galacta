@@ -4,13 +4,13 @@ import GameMenu from './pages/game-menu'
 
 function App() {
   const [displayGame, setDisplayGame] = useState(false)
-  const shouldDisplayGame = () => {
-    setDisplayGame(true)
+  const shouldDisplayGame = (value) => {
+    setDisplayGame(value)
   }
   return (
     <>
-      {!displayGame && <GameMenu onClick={shouldDisplayGame} />}
-      {displayGame && <Galacta />}
+      {!displayGame && <GameMenu shouldDisplayGame={shouldDisplayGame} />}
+      {displayGame && <Galacta shouldDisplayGame={shouldDisplayGame} />}
     </>
   )
 }

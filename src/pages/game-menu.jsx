@@ -1,6 +1,4 @@
-import { FC } from 'react'
-
-const GameMenu = ({ onClick }) => {
+const GameMenu = ({ shouldDisplayGame }) => {
   return (
     <div className="flex justify-center items-center h-full flex-col">
       <h1 className="text-9xl mb-28">
@@ -10,7 +8,7 @@ const GameMenu = ({ onClick }) => {
       <div className="w-[180px] flex flex-col gap-8">
         <button
           className="border-2 p-4 font-semibold border-black hover:animate-pulse"
-          onClick={onClick}
+          onClick={() => shouldDisplayGame(true)}
         >
           NEW GAME
         </button>
