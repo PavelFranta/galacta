@@ -4,12 +4,13 @@ import Rocket from '../components/rocket'
 import Shot from '../components/shot'
 import Pause from '../components/banners/pause'
 import Win from '../components/banners/win'
+import Lose from '../components/banners/lose'
+import InGameScore from '../components/banners/ingame-score'
 
 import useKeyboardReader from '../hooks/keyboardReader'
 import useWindowDimensions from '../hooks/windowDimensions'
 
 import generateArmy from '../generators/aliensArmy'
-import InGameScore from '../components/banners/ingame-score'
 
 function Galacta({ shouldDisplayGame }) {
   const { height, width } = useWindowDimensions()
@@ -21,20 +22,42 @@ function Galacta({ shouldDisplayGame }) {
   const [aliensKilled, setAliensKilled] = useState(0)
   const [shotsShot, setshotsShot] = useState(0)
   const [win, setWin] = useState(false)
+  const [lose, setLose] = useState(false)
   const [pausedGame, setPausedGame] = useState(true)
 
   let pressedKey = useKeyboardReader()
-
-  useEffect(() => {
-    processMove(pressedKey?.code)
-  }, [pressedKey])
 
   const restart = () => {
     setActiveAliens(generateArmy(width, 1))
     setshotsShot(0)
     setAliensKilled(0)
     setWin(false)
+    setLose(false)
     setPausedGame(false)
+  }
+
+  const hit = () => {
+    activeShots.forEach(shot => {
+      activeAliens.forEach(alien => {
+        if (
+          shot.positionX > alien.positionX &&
+          shot.positionX < alien.positionX + 64 &&
+          shot.positionY > alien.positionY &&
+          shot.positionY < alien.positionY + 64
+        ) {
+          setActiveAliens(
+            activeAliens.filter(currentAlien => currentAlien !== alien)
+          )
+          setActiveShots(
+            activeShots.filter(currentShot => currentShot !== shot)
+          )
+          setAliensKilled(aliensKilled + 1)
+          if (activeAliens.length === 1) {
+            setWin(true)
+          }
+        }
+      })
+    })
   }
 
   const processMove = keyCode => {
@@ -85,52 +108,38 @@ function Galacta({ shouldDisplayGame }) {
     }
   }
 
-  useEffect(() => {
-    hit()
-    const intervalId = setInterval(
-      () => {
-        if (activeShots.length) {
-          setActiveShots(
-            activeShots
-              .filter(shot => shot.positionY > -1500)
-              .map(shot => {
-                return {
-                  positionX: shot?.positionX,
-                  positionY: shot?.positionY - 8,
-                }
-              })
-          )
-        } else {
-          clearInterval(intervalId)
-        }
-      },
-      pausedGame ? 99999999 : 10
-    )
-    return () => clearInterval(intervalId)
-  }, [activeShots, pausedGame])
-
-  const hit = () => {
-    activeShots.forEach(shot => {
-      activeAliens.forEach(alien => {
-        if (
-          shot.positionX > alien.positionX &&
-          shot.positionX < alien.positionX + 64 &&
-          shot.positionY > alien.positionY &&
-          shot.positionY < alien.positionY + 64
-        ) {
-          setActiveAliens(
-            activeAliens.filter(currentAlien => currentAlien !== alien)
-          )
-          setActiveShots(
-            activeShots.filter(currentShot => currentShot !== shot)
-          )
-          setAliensKilled(aliensKilled + 1)
-          if (activeAliens.length === 1) {
-            setWin(true)
+  const shotsMoverMapping = () => {
+    setActiveShots(
+      activeShots
+        .filter(shot => shot.positionY > -1500)
+        .map(shot => {
+          return {
+            positionX: shot?.positionX,
+            positionY: shot?.positionY - 8,
           }
+        })
+    )
+  }
+
+  const aliensMoverMapping = () => {
+    setActiveAliens(
+      activeAliens.map(alien => {
+        return {
+          positionX: alien?.positionX,
+          positionY: alien?.positionY + 2,
+          alienName: alien?.alienName,
+          pulse: alien?.pulse,
         }
       })
-    })
+    )
+
+    doesAlienBreakThru()
+  }
+
+  const doesAlienBreakThru = () => {
+    if (activeAliens.some(alien => alien.positionY > height - 64)) {
+      setLose(true)
+    }
   }
 
   useEffect(() => {
@@ -139,20 +148,30 @@ function Galacta({ shouldDisplayGame }) {
   }, [])
 
   useEffect(() => {
+    processMove(pressedKey?.code)
+  }, [pressedKey])
+
+  useEffect(() => {
+    hit()
+    const interval = setInterval(
+      () => {
+        if (activeShots.length) {
+          shotsMoverMapping()
+        } else {
+          clearInterval(interval)
+        }
+      },
+      pausedGame || lose ? 99999999 : 10
+    )
+    return () => clearInterval(interval)
+  }, [activeShots, pausedGame])
+
+  useEffect(() => {
     const intervalId = setInterval(
       () => {
-        setActiveAliens(
-          activeAliens.map(alien => {
-            return {
-              positionX: alien?.positionX,
-              positionY: alien?.positionY + 2,
-              alienName: alien?.alienName,
-              pulse: alien?.pulse,
-            }
-          })
-        )
+        aliensMoverMapping()
       },
-      pausedGame ? 99999999 : 100
+      pausedGame || lose ? 99999999 : 100
     )
     return () => clearInterval(intervalId)
   }, [activeAliens, pausedGame])
@@ -161,6 +180,13 @@ function Galacta({ shouldDisplayGame }) {
     <div className="w-full h-full bg-gray-900 relative z-10">
       {win && (
         <Win
+          aliensKilled={aliensKilled}
+          shotsShot={shotsShot}
+          restart={restart}
+        />
+      )}
+      {lose && (
+        <Lose
           aliensKilled={aliensKilled}
           shotsShot={shotsShot}
           restart={restart}
