@@ -20,14 +20,12 @@ function Galacta({ shouldDisplayGame }) {
   const [hitSound] = useSound('hit.wav')
   const [winSound] = useSound('win.mp3', { volume: 1.5 })
   const [loseSoundTwo] = useSound('hh-bitch.mp3')
-  const [loseSound] = useSound('free-pass-bitch.mp3')
   const [loseSoundThree] = useSound('stupid-bitch.mp3')
   const [monsterKillSound] = useSound('monsterkill.mp3')
   const [godlikeSound] = useSound('godlike.mp3')
   const [killingSpreeSound] = useSound('killing-spree.mp3')
   const [firstBloodSound] = useSound('first-blood.mp3')
   const [holyShitSound] = useSound('holy-shit.mp3')
-  const [hhBitchSound] = useSound('hh-bitch.mp3')
 
   const [height, width] = useWindowDimensions()
   const [rocketPositionX, setRocketPositionX] = useState(width / 2)
@@ -96,11 +94,25 @@ function Galacta({ shouldDisplayGame }) {
     })
   }
 
+  const crashWithAlienDetector = () => {
+    activeAliens.forEach(alien => {
+      if (
+        rocketPositionX > alien.positionX &&
+        rocketPositionX < alien.positionX + ALIEN_AND_ROCKET_ICON_SIZE &&
+        rocketPositionY > alien.positionY &&
+        rocketPositionY < alien.positionY + ALIEN_AND_ROCKET_ICON_SIZE
+      ) {
+        loseSoundThree()
+        setLose(true)
+      }
+    })
+  }
+
   const processUserInput = keyCode => {
     if (
       (!pausedGame && !win) ||
       (pausedGame && keyCode === 'Escape') ||
-      (win && keyCode === 'Enter')
+      ((win || lose) && keyCode === 'Enter')
     ) {
       switch (keyCode) {
         case 'ArrowRight':
@@ -184,7 +196,7 @@ function Galacta({ shouldDisplayGame }) {
         }
       })
     )
-
+    crashWithAlienDetector()
     doesAlienBreakThru()
   }
 
@@ -194,7 +206,7 @@ function Galacta({ shouldDisplayGame }) {
         alien => alien.positionY > height - ALIEN_AND_ROCKET_ICON_SIZE
       )
     ) {
-      loseSoundThree()
+      loseSoundTwo()
       setLose(true)
     }
   }
