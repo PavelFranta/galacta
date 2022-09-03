@@ -97,10 +97,10 @@ function Galacta({ shouldDisplayGame }) {
   const crashWithAlienDetector = () => {
     activeAliens.forEach(alien => {
       if (
-        rocketPositionX > alien.positionX &&
-        rocketPositionX < alien.positionX + ALIEN_AND_ROCKET_ICON_SIZE &&
-        rocketPositionY > alien.positionY &&
-        rocketPositionY < alien.positionY + ALIEN_AND_ROCKET_ICON_SIZE
+        rocketPositionX >= alien.positionX &&
+        rocketPositionX <= alien.positionX + ALIEN_AND_ROCKET_ICON_SIZE &&
+        rocketPositionY >= alien.positionY &&
+        rocketPositionY <= alien.positionY + ALIEN_AND_ROCKET_ICON_SIZE
       ) {
         loseSoundThree()
         setLose(true)
@@ -133,7 +133,7 @@ function Galacta({ shouldDisplayGame }) {
         case 'Escape':
           setPausedGame(!pausedGame)
         case 'Enter':
-          if (win) {
+          if (win || lose) {
             restart()
           }
         default:
