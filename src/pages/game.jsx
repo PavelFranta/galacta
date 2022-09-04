@@ -15,18 +15,25 @@ import generateArmy from '../generators/aliensArmy'
 
 export const ALIEN_AND_ROCKET_ICON_SIZE = 64
 function Galacta({ shouldDisplayGame }) {
-  const [shotSound] = useSound('shot.wav')
-  const [hitSound] = useSound('hit.wav')
-  const [winSound] = useSound('win.mp3', { volume: 1.5 })
-  const [loseSoundTwo] = useSound('hh-bitch.mp3')
-  const [loseSoundThree] = useSound('stupid-bitch.mp3')
-  const [monsterKillSound] = useSound('monster-kill.mp3')
-  const [godlikeSound] = useSound('godlike.mp3')
-  const [killingSpreeSound] = useSound('killing-spree.mp3')
-  const [firstBloodSound] = useSound('first-blood.mp3')
-  const [holyShitSound] = useSound('holy-shit.mp3')
-  const [idiotSound] = useSound('idiot.mp3')
-  const [battleCruiserSound] = useSound('battle-cruiser.mp3')
+  const [shotSound] = useSound('sounds/effects/shot.wav')
+  const [hitSound] = useSound('sounds/effects/hit.wav')
+  const [winSound] = useSound('sounds/talks/win.mp3', { volume: 1.5 })
+  const [loseSoundTwo] = useSound('sounds/talks/hh-bitch.mp3')
+  const [loseSoundThree] = useSound('sounds/talks/stupid-bitch.mp3')
+  const [monsterKillSound] = useSound('sounds/talks/monster-kill.mp3')
+  const [godlikeSound] = useSound('sounds/talks/godlike.mp3')
+  const [killingSpreeSound] = useSound('sounds/talks/killing-spree.mp3')
+  const [firstBloodSound] = useSound('sounds/talks/first-blood.mp3')
+  const [holyShitSound] = useSound('sounds/talks/holy-shit.mp3')
+  const [idiotSound] = useSound('sounds/talks/idiot.mp3')
+  const [goAheadCommanderSound] = useSound(
+    'sounds/talks/go-ahead-commander.mp3'
+  )
+  const [levelOneMusic] = useSound('sounds/music/level-one-music.mp3')
+  const [levelTwoMusic] = useSound('sounds/music/level-two-music.mp3')
+  const [levelThreeMusic] = useSound('sounds/music/level-three-music.mp3')
+
+  const musicStackForLevels = [levelOneMusic, levelTwoMusic, levelThreeMusic]
 
   const [screenHeight, screenWidth] = useWindowDimensions()
   const [rocketPositionX, setRocketPositionX] = useState(screenWidth / 2)
@@ -34,6 +41,7 @@ function Galacta({ shouldDisplayGame }) {
     screenHeight - screenHeight * 0.1
   )
   const [activeShots, setActiveShots] = useState([])
+  const [currentLevel, setCurrentLevel] = useState(1)
   const [activeAliens, setActiveAliens] = useState([])
   const [aliensKilled, setAliensKilled] = useState(0)
   const [shotsShot, setShotsShot] = useState(0)
@@ -50,7 +58,7 @@ function Galacta({ shouldDisplayGame }) {
     setWin(false)
     setLose('')
     setPausedGame(false)
-    battleCruiserSound()
+    goAheadCommanderSound()
   }
 
   const hitDetector = () => {
@@ -218,7 +226,7 @@ function Galacta({ shouldDisplayGame }) {
   }
 
   useEffect(() => {
-    battleCruiserSound()
+    goAheadCommanderSound()
     setActiveAliens(generateArmy(screenWidth, 3))
     setPausedGame(false)
   }, [])

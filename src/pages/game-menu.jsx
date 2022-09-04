@@ -4,7 +4,12 @@ import { useSound } from 'use-sound'
 
 const GameMenu = ({ shouldDisplayGame }) => {
   let pressedKey = useKeyboardReader()
-  const [battleCruiserSound] = useSound('battle-cruiser.mp3')
+  const [goAheadCommanderSound] = useSound('go-ahead-commander.mp3')
+  const [menuThemeMusic] = useSound('menu-theme-music.mp3')
+
+  useEffect(() => {
+    processUserInput(pressedKey?.code)
+  }, [pressedKey])
 
   useEffect(() => {
     processUserInput(pressedKey?.code)
@@ -26,7 +31,7 @@ const GameMenu = ({ shouldDisplayGame }) => {
 
   const startGame = () => {
     shouldDisplayGame(true)
-    battleCruiserSound()
+    goAheadCommanderSound()
   }
 
   return (
