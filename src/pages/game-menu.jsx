@@ -12,9 +12,6 @@ const GameMenu = ({ shouldDisplayGame }) => {
         >
           NEW GAME
         </button>
-        {/* <button className="border-2 p-4 font-semibold border-black  hover:animate-pulse">
-          TOP SCORE*
-        </button> */}
         <a
           className="border-2 p-4 font-semibold border-black no-underline text-center  hover:animate-pulse"
           href="https://www.youtube.com/watch?v=rMcEwaGz_64"

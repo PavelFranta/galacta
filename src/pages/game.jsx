@@ -21,7 +21,7 @@ function Galacta({ shouldDisplayGame }) {
   const [winSound] = useSound('win.mp3', { volume: 1.5 })
   const [loseSoundTwo] = useSound('hh-bitch.mp3')
   const [loseSoundThree] = useSound('stupid-bitch.mp3')
-  const [monsterKillSound] = useSound('monsterkill.mp3')
+  const [monsterKillSound] = useSound('monster-kill.mp3')
   const [godlikeSound] = useSound('godlike.mp3')
   const [killingSpreeSound] = useSound('killing-spree.mp3')
   const [firstBloodSound] = useSound('first-blood.mp3')
@@ -38,7 +38,7 @@ function Galacta({ shouldDisplayGame }) {
   const [aliensKilled, setAliensKilled] = useState(0)
   const [shotsShot, setShotsShot] = useState(0)
   const [win, setWin] = useState(false)
-  const [lose, setLose] = useState(false)
+  const [lose, setLose] = useState('')
   const [pausedGame, setPausedGame] = useState(true)
 
   let pressedKey = useKeyboardReader()
@@ -48,7 +48,7 @@ function Galacta({ shouldDisplayGame }) {
     setShotsShot(0)
     setAliensKilled(0)
     setWin(false)
-    setLose(false)
+    setLose('')
     setPausedGame(false)
   }
 
@@ -106,14 +106,14 @@ function Galacta({ shouldDisplayGame }) {
         rocketPositionY <= alien.positionY + ALIEN_AND_ROCKET_ICON_SIZE
       ) {
         loseSoundThree()
-        setLose(true)
+        setLose('crash-with-rocket')
       }
     })
   }
 
   const processUserInput = keyCode => {
     if (
-      (!pausedGame && !win) ||
+      (!pausedGame && !win && !lose) ||
       (pausedGame && keyCode === 'Escape') ||
       ((win || lose) && keyCode === 'Enter')
     ) {
@@ -131,6 +131,7 @@ function Galacta({ shouldDisplayGame }) {
           moveDown()
           break
         case 'Space':
+          console.log('shot')
           fireNewShot()
           break
         case 'Escape':
@@ -210,7 +211,7 @@ function Galacta({ shouldDisplayGame }) {
       )
     ) {
       loseSoundTwo()
-      setLose(true)
+      setLose('break-into-base')
     }
   }
 
@@ -250,7 +251,7 @@ function Galacta({ shouldDisplayGame }) {
 
   return (
     <>
-      {screenWidth >= 580 && (
+      {screenWidth >= 580 && screenHeight >= 580 && (
         <div className="w-full h-full bg-gray-900 relative z-10">
           {win && (
             <Win
@@ -297,7 +298,7 @@ function Galacta({ shouldDisplayGame }) {
           )}
         </div>
       )}
-      {screenWidth < 580 && (
+      {(screenWidth < 580 || screenHeight < 580) && (
         <div className="h-full flex items-center justify-center flex-col">
           <h1 className="text-2xl text-center">
             Na mobilu to hrát nebudeš more !!!
