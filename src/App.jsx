@@ -18,7 +18,7 @@ function App() {
     if (displayGame) {
       stopMenuThemeMusic()
     }
-  }, [displayGame])
+  }, [displayGame, stopMenuThemeMusic])
   menuThemeMusic()
 
   return (
