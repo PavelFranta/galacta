@@ -5,6 +5,7 @@ const useKeyboardReader = () => {
 
   useEffect(() => {
     function handleResize(value) {
+      console.log(value.code)
       switch (value.code) {
         case 'ArrowUp':
         case 'ArrowDown':
@@ -13,10 +14,11 @@ const useKeyboardReader = () => {
         case 'Space':
         case 'Escape':
         case 'Enter':
+        case 'NumpadEnter':
           setPressedKey(value)
-          break;     
+          break
         default:
-          break;
+          break
       }
     }
 

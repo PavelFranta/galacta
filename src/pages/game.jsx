@@ -26,6 +26,7 @@ function Galacta({ shouldDisplayGame }) {
   const [firstBloodSound] = useSound('first-blood.mp3')
   const [holyShitSound] = useSound('holy-shit.mp3')
   const [idiotSound] = useSound('idiot.mp3')
+  const [battleCruiserSound] = useSound('battle-cruiser.mp3')
 
   const [screenHeight, screenWidth] = useWindowDimensions()
   const [rocketPositionX, setRocketPositionX] = useState(screenWidth / 2)
@@ -49,6 +50,7 @@ function Galacta({ shouldDisplayGame }) {
     setWin(false)
     setLose('')
     setPausedGame(false)
+    battleCruiserSound()
   }
 
   const hitDetector = () => {
@@ -136,6 +138,7 @@ function Galacta({ shouldDisplayGame }) {
         case 'Escape':
           setPausedGame(!pausedGame)
         case 'Enter':
+        case 'NumpadEnter':
           if (win || lose) {
             restart()
           }
@@ -215,6 +218,7 @@ function Galacta({ shouldDisplayGame }) {
   }
 
   useEffect(() => {
+    battleCruiserSound()
     setActiveAliens(generateArmy(screenWidth, 3))
     setPausedGame(false)
   }, [])
@@ -252,26 +256,30 @@ function Galacta({ shouldDisplayGame }) {
     <>
       {screenWidth >= 580 && screenHeight >= 580 && (
         <div className="w-full h-full bg-gray-900 relative z-10">
-          {win && (
-            <Win
-              aliensKilled={aliensKilled}
-              shotsShot={shotsShot}
-              restart={restart}
-            />
-          )}
-          {lose && (
-            <Lose
-              aliensKilled={aliensKilled}
-              shotsShot={shotsShot}
-              restart={restart}
-            />
-          )}
-          {pausedGame && !win && (
-            <Pause
-              shouldDisplayGame={shouldDisplayGame}
-              setPausedGame={setPausedGame}
-            />
-          )}
+          <div className="w-full h-full flex justify-center items-center">
+            {win && (
+              <Win
+                aliensKilled={aliensKilled}
+                shotsShot={shotsShot}
+                restart={restart}
+                shouldDisplayGame={shouldDisplayGame}
+              />
+            )}
+            {lose && (
+              <Lose
+                aliensKilled={aliensKilled}
+                shotsShot={shotsShot}
+                restart={restart}
+                shouldDisplayGame={shouldDisplayGame}
+              />
+            )}
+            {pausedGame && !win && (
+              <Pause
+                shouldDisplayGame={shouldDisplayGame}
+                setPausedGame={setPausedGame}
+              />
+            )}
+          </div>
           <Rocket
             rocketPositionX={rocketPositionX}
             rocketPositionY={rocketPositionY}
@@ -306,7 +314,7 @@ function Galacta({ shouldDisplayGame }) {
             className="mt-8 border-2 border-black p-4"
             onClick={() => idiotSound()}
           >
-            Udělit pokání
+            Učinit pokání
           </button>
         </div>
       )}

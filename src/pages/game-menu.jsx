@@ -1,4 +1,34 @@
+import useKeyboardReader from './../hooks/keyboardReader'
+import { useEffect } from 'react'
+import { useSound } from 'use-sound'
+
 const GameMenu = ({ shouldDisplayGame }) => {
+  let pressedKey = useKeyboardReader()
+  const [battleCruiserSound] = useSound('battle-cruiser.mp3')
+
+  useEffect(() => {
+    processUserInput(pressedKey?.code)
+  }, [pressedKey])
+
+  const processUserInput = keyCode => {
+    switch (keyCode) {
+      case 'Escape':
+        window.location.replace('https://www.youtube.com/watch?v=rMcEwaGz_64')
+        break
+      case 'Enter':
+      case 'NumpadEnter':
+        startGame()
+        break
+      default:
+        break
+    }
+  }
+
+  const startGame = () => {
+    shouldDisplayGame(true)
+    battleCruiserSound()
+  }
+
   return (
     <div className="flex justify-center items-center h-full flex-col">
       <h1 className="text-5xl lg:text-9xl mb-28">
@@ -8,7 +38,7 @@ const GameMenu = ({ shouldDisplayGame }) => {
       <div className="w-[180px] flex flex-col gap-8">
         <button
           className="border-2 p-4 font-semibold border-black hover:animate-pulse"
-          onClick={() => shouldDisplayGame(true)}
+          onClick={() => startGame()}
         >
           NEW GAME
         </button>
