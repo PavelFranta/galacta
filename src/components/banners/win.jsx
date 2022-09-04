@@ -1,10 +1,18 @@
 import { React } from 'react'
 import PropTypes from 'prop-types'
 
-const Win = ({ aliensKilled, shotsShot, restart, shouldDisplayGame }) => {
+const Win = ({
+  aliensKilled,
+  shotsShot,
+  restart,
+  shouldDisplayGame,
+  totalWin
+}) => {
   return (
     <div className="text-white flex flex-col p-4 text-xl items-center gap-4 border border-white w-fit mx-auto">
-      <div className="text-8xl p-4">Vyhráls more</div>
+      <div className="text-8xl p-4">
+        Vyhráls more {totalWin && 'VSECHNO !!!'}
+      </div>
       <div>Score: {aliensKilled}</div>
       <div>Shots: {shotsShot}</div>
       <div className="flex flex-col">
@@ -26,7 +34,8 @@ Win.propTypes = {
   aliensKilled: PropTypes.number,
   shotsShot: PropTypes.number,
   restart: PropTypes.func.isRequired,
-  shouldDisplayGame: PropTypes.func.isRequired
+  shouldDisplayGame: PropTypes.func.isRequired,
+  totalWin: PropTypes.bool
 }
 
 export default Win

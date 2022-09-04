@@ -221,9 +221,11 @@ function Galacta({ shouldDisplayGame }) {
           if (activeAliens.length === 1) {
             winSound()
             setWin(true)
-            setTimeout(() => {
-              setCurrentLevel(() => currentLevel + 1)
-            }, 3000)
+            if (currentLevel < 8) {
+              setTimeout(() => {
+                setCurrentLevel(() => currentLevel + 1)
+              }, 3000)
+            }
           }
         }
       })
@@ -371,7 +373,7 @@ function Galacta({ shouldDisplayGame }) {
       () => {
         aliensMoverMapping()
       },
-      pausedGame || lose ? 99999999 : 100
+      pausedGame || lose ? 99999999 : 100 - currentLevel * 8
     )
     return () => clearInterval(intervalId)
   }, [activeAliens, pausedGame, lose])
@@ -387,6 +389,7 @@ function Galacta({ shouldDisplayGame }) {
                 shotsShot={shotsShot}
                 restart={restart}
                 shouldDisplayGame={shouldDisplayGame}
+                totalWin={currentLevel === 7}
               />
             )}
             {lose && (
