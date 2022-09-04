@@ -1,3 +1,6 @@
+import { React } from 'react'
+import PropTypes from 'prop-types'
+
 const Win = ({ aliensKilled, shotsShot, restart, shouldDisplayGame }) => {
   return (
     <div className="text-white flex flex-col p-4 text-xl items-center gap-4 border border-white w-fit mx-auto">
@@ -12,11 +15,18 @@ const Win = ({ aliensKilled, shotsShot, restart, shouldDisplayGame }) => {
           className="border border-white p-2 mt-4"
           onClick={() => shouldDisplayGame(false)}
         >
-          Hlavní menu
+          MAIN MENU
         </button>
       </div>
     </div>
   )
+}
+
+Win.propTypes = {
+  aliensKilled: PropTypes.number,
+  shotsShot: PropTypes.number,
+  restart: PropTypes.func.isRequired,
+  shouldDisplayGame: PropTypes.func.isRequired
 }
 
 export default Win

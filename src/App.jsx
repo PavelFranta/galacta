@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { React, useState, useEffect } from 'react'
 import { useSound } from 'use-sound'
 
 import Galacta from './pages/game'
@@ -6,7 +6,7 @@ import GameMenu from './pages/game-menu'
 
 function App() {
   const [displayGame, setDisplayGame] = useState(false)
-  const [menuThemeMusic, { stop }] = useSound(
+  const [menuThemeMusic, { stop: stopMenuThemeMusic }] = useSound(
     'sounds/music/menu-theme-music.mp3'
   )
 
@@ -16,7 +16,7 @@ function App() {
 
   useEffect(() => {
     if (displayGame) {
-      stop()
+      stopMenuThemeMusic()
     }
   }, [displayGame])
   menuThemeMusic()

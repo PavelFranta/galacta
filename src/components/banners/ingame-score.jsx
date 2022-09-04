@@ -1,3 +1,6 @@
+import { React } from 'react'
+import PropTypes from 'prop-types'
+
 const InGameScore = ({ aliensKilled, shotsShot }) => {
   return (
     <div className="text-white flex flex-col absolute bottom-0 right-100 p-4 text-xl z-10">
@@ -5,6 +8,11 @@ const InGameScore = ({ aliensKilled, shotsShot }) => {
       <div>Shots: {shotsShot}</div>
     </div>
   )
+}
+
+InGameScore.propTypes = {
+  aliensKilled: PropTypes.number,
+  shotsShot: PropTypes.number
 }
 
 export default InGameScore

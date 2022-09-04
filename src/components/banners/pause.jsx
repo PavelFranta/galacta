@@ -1,3 +1,6 @@
+import { React } from 'react'
+import PropTypes from 'prop-types'
+
 const Pause = ({ setPausedGame, shouldDisplayGame }) => {
   return (
     <div className="text-white flex flex-col p-4 text-xl items-center gap-4 relative z-20 bg-gray-900 w-fit mx-auto border border-white">
@@ -13,11 +16,16 @@ const Pause = ({ setPausedGame, shouldDisplayGame }) => {
           className="border border-white p-2 mt-4"
           onClick={() => shouldDisplayGame(false)}
         >
-          Hlavní menu
+          MAIN MENU
         </button>
       </div>
     </div>
   )
+}
+
+Pause.propTypes = {
+  shouldDisplayGame: PropTypes.func.isRequired,
+  setPausedGame: PropTypes.func.isRequired
 }
 
 export default Pause

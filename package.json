@@ -10,6 +10,7 @@
     "@types/node": "^17.0.23",
     "@types/react": "^17.0.43",
     "classnames": "^2.3.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-scripts": "^5.0.0",
@@ -37,6 +38,12 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.4",
+    "eslint": "^8.23.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.5",
+    "eslint-plugin-promise": "^6.0.1",
+    "eslint-plugin-react": "^7.31.5",
     "postcss": "^8.4.12",
     "prettier": "2.6.1",
     "tailwindcss": "^3.0.23"

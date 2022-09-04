@@ -1,19 +1,23 @@
-import { useState, useEffect } from 'react'
+import { React, useState, useEffect, useCallback } from 'react'
 import { useSound } from 'use-sound'
+import PropTypes from 'prop-types'
+
 import Alien from '../components/alien'
 import Rocket from '../components/rocket'
 import Shot from '../components/shot'
 import Pause from '../components/banners/pause'
 import Win from '../components/banners/win'
-import Lose from '../components/banners/lose'
+import Lose, { BREAK_THRU, CRASH } from '../components/banners/lose'
 import InGameScore from '../components/banners/ingame-score'
 
 import useKeyboardReader from '../hooks/keyboardReader'
 import useWindowDimensions from '../hooks/windowDimensions'
 
 import generateArmy from '../generators/aliensArmy'
+import NotOnPhone from '../components/banners/not-on-phone'
 
 export const ALIEN_AND_ROCKET_ICON_SIZE = 64
+
 function Galacta({ shouldDisplayGame }) {
   const [shotSound] = useSound('sounds/effects/shot.wav')
   const [hitSound] = useSound('sounds/effects/hit.wav')
@@ -25,15 +29,24 @@ function Galacta({ shouldDisplayGame }) {
   const [killingSpreeSound] = useSound('sounds/talks/killing-spree.mp3')
   const [firstBloodSound] = useSound('sounds/talks/first-blood.mp3')
   const [holyShitSound] = useSound('sounds/talks/holy-shit.mp3')
-  const [idiotSound] = useSound('sounds/talks/idiot.mp3')
   const [goAheadCommanderSound] = useSound(
     'sounds/talks/go-ahead-commander.mp3'
   )
-  const [levelOneMusic] = useSound('sounds/music/level-one-music.mp3')
-  const [levelTwoMusic] = useSound('sounds/music/level-two-music.mp3')
-  const [levelThreeMusic] = useSound('sounds/music/level-three-music.mp3')
 
-  const musicStackForLevels = [levelOneMusic, levelTwoMusic, levelThreeMusic]
+  const [levelOneMusic, { stop: levelOneMusicStop }] = useSound(
+    'sounds/music/level-one-music.mp3'
+  )
+  const [levelTwoMusic, { stop: levelTwoMusicStop }] = useSound(
+    'sounds/music/level-two-music.mp3'
+  )
+  const [levelThreeMusic, { stop: levelThreeMusicStop }] = useSound(
+    'sounds/music/level-three-music.mp3'
+  )
+
+  const musicStackForLevels = useCallback(
+    () => [levelOneMusic, levelTwoMusic, levelThreeMusic],
+    [levelOneMusic, levelTwoMusic, levelThreeMusic]
+  )
 
   const [screenHeight, screenWidth] = useWindowDimensions()
   const [rocketPositionX, setRocketPositionX] = useState(screenWidth / 2)
@@ -47,21 +60,57 @@ function Galacta({ shouldDisplayGame }) {
   const [shotsShot, setShotsShot] = useState(0)
   const [win, setWin] = useState(false)
   const [lose, setLose] = useState('')
-  const [pausedGame, setPausedGame] = useState(true)
+  const [pausedGame, setPausedGame] = useState(false)
+  const [gameRunning, setGameRunning] = useState(false)
 
-  let pressedKey = useKeyboardReader()
+  const pressedKey = useKeyboardReader()
+  const stopAllMusic = useCallback(() => {
+    levelOneMusicStop()
+    levelTwoMusicStop()
+    levelThreeMusicStop()
+  }, [levelOneMusicStop, levelTwoMusicStop, levelThreeMusicStop])
 
-  const restart = () => {
-    setActiveAliens(generateArmy(screenWidth, 3))
+  const restart = useCallback(() => {
+    setActiveAliens(generateArmy(screenWidth, currentLevel))
     setShotsShot(0)
     setAliensKilled(0)
+    setCurrentLevel(1)
     setWin(false)
     setLose('')
     setPausedGame(false)
     goAheadCommanderSound()
-  }
+    setGameRunning(true)
+  }, [])
 
-  const hitDetector = () => {
+  useEffect(() => {
+    if (!win && !lose && !pausedGame && gameRunning) {
+      stopAllMusic()
+      musicStackForLevels()[currentLevel]()
+    } else {
+      stopAllMusic()
+    }
+  }, [
+    win,
+    lose,
+    pausedGame,
+    gameRunning,
+    currentLevel,
+    levelOneMusicStop,
+    levelTwoMusicStop,
+    levelThreeMusicStop,
+    musicStackForLevels,
+    stopAllMusic
+  ])
+
+  useEffect(() => {
+    restart()
+  }, [])
+
+  const hasSuitableViewport = useCallback(() => {
+    return screenWidth >= 580 && screenHeight >= 580
+  }, [screenHeight, screenWidth])
+
+  const hitDetector = useCallback(() => {
     activeShots.forEach(shot => {
       activeAliens.forEach(alien => {
         if (
@@ -104,7 +153,7 @@ function Galacta({ shouldDisplayGame }) {
         }
       })
     })
-  }
+  })
 
   const crashWithAlienDetector = () => {
     activeAliens.forEach(alien => {
@@ -115,12 +164,25 @@ function Galacta({ shouldDisplayGame }) {
         rocketPositionY <= alien.positionY + ALIEN_AND_ROCKET_ICON_SIZE
       ) {
         loseSoundThree()
-        setLose('crash-with-rocket')
+        setLose(CRASH)
+        setGameRunning(false)
       }
     })
   }
 
-  const processUserInput = keyCode => {
+  const doesAlienBreakThru = () => {
+    if (
+      activeAliens.some(
+        alien => alien.positionY > screenHeight - ALIEN_AND_ROCKET_ICON_SIZE
+      )
+    ) {
+      loseSoundTwo()
+      setLose(BREAK_THRU)
+      setGameRunning(false)
+    }
+  }
+
+  const processUserInput = useCallback(keyCode => {
     if (
       (!pausedGame && !win && !lose) ||
       (pausedGame && keyCode === 'Escape') ||
@@ -140,21 +202,22 @@ function Galacta({ shouldDisplayGame }) {
           moveDown()
           break
         case 'Space':
-          console.log('shot')
           fireNewShot()
           break
         case 'Escape':
           setPausedGame(!pausedGame)
+          break
         case 'Enter':
         case 'NumpadEnter':
           if (win || lose) {
             restart()
           }
+          break
         default:
           break
       }
     }
-  }
+  })
 
   const moveRight = () => {
     if (rocketPositionX + 20 + 60 < screenWidth) {
@@ -180,56 +243,39 @@ function Galacta({ shouldDisplayGame }) {
   const fireNewShot = () => {
     setActiveShots([
       ...activeShots,
-      { positionX: rocketPositionX + 30.5, positionY: rocketPositionY - 5 },
+      { positionX: rocketPositionX + 30.5, positionY: rocketPositionY - 5 }
     ])
     setShotsShot(shotsShot + 1)
     shotSound()
   }
 
-  const shotsMoverMapping = () => {
+  const shotsMoverMapping = useCallback(() => {
     setActiveShots(
       activeShots
         .filter(shot => shot.positionY > -1500)
         .map(shot => {
           return {
             positionX: shot?.positionX,
-            positionY: shot?.positionY - 8,
+            positionY: shot?.positionY - 8
           }
         })
     )
-  }
+  }, [activeShots])
 
-  const aliensMoverMapping = () => {
+  const aliensMoverMapping = useCallback(() => {
     setActiveAliens(
       activeAliens.map(alien => {
         return {
           positionX: alien?.positionX,
           positionY: alien?.positionY + 2,
           alienName: alien?.alienName,
-          pulse: alien?.pulse,
+          pulse: alien?.pulse
         }
       })
     )
     crashWithAlienDetector()
     doesAlienBreakThru()
-  }
-
-  const doesAlienBreakThru = () => {
-    if (
-      activeAliens.some(
-        alien => alien.positionY > screenHeight - ALIEN_AND_ROCKET_ICON_SIZE
-      )
-    ) {
-      loseSoundTwo()
-      setLose('break-into-base')
-    }
-  }
-
-  useEffect(() => {
-    goAheadCommanderSound()
-    setActiveAliens(generateArmy(screenWidth, 3))
-    setPausedGame(false)
-  }, [])
+  }, [activeAliens])
 
   useEffect(() => {
     processUserInput(pressedKey?.code)
@@ -262,7 +308,7 @@ function Galacta({ shouldDisplayGame }) {
 
   return (
     <>
-      {screenWidth >= 580 && screenHeight >= 580 && (
+      {hasSuitableViewport() && (
         <div className="w-full h-full bg-gray-900 relative z-10">
           <div className="w-full h-full flex justify-center items-center">
             {win && (
@@ -275,6 +321,7 @@ function Galacta({ shouldDisplayGame }) {
             )}
             {lose && (
               <Lose
+                reason={lose}
                 aliensKilled={aliensKilled}
                 shotsShot={shotsShot}
                 restart={restart}
@@ -313,21 +360,13 @@ function Galacta({ shouldDisplayGame }) {
           )}
         </div>
       )}
-      {(screenWidth < 580 || screenHeight < 580) && (
-        <div className="h-full flex items-center justify-center flex-col">
-          <h1 className="text-2xl text-center">
-            Na mobilu to hrát nebudeš more !!!
-          </h1>
-          <button
-            className="mt-8 border-2 border-black p-4"
-            onClick={() => idiotSound()}
-          >
-            Učinit pokání
-          </button>
-        </div>
-      )}
+      {!hasSuitableViewport() && <NotOnPhone />}
     </>
   )
+}
+
+Galacta.propTypes = {
+  shouldDisplayGame: PropTypes.func.isRequired
 }
 
 export default Galacta
