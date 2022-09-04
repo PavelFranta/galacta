@@ -198,7 +198,7 @@ function Galacta({ shouldDisplayGame }) {
     winSound
   ])
 
-  const crashWithAlienDetector = () => {
+  const crashWithAlienDetector = useCallback(() => {
     activeAliens.forEach(alien => {
       if (
         rocketPositionX >= alien.positionX &&
@@ -211,9 +211,9 @@ function Galacta({ shouldDisplayGame }) {
         setGameRunning(false)
       }
     })
-  }
+  }, [activeAliens, loseSoundThree, rocketPositionX, rocketPositionY])
 
-  const doesAlienBreakThru = () => {
+  const doesAlienBreakThru = useCallback(() => {
     if (
       activeAliens.some(
         alien => alien.positionY > screenHeight - ALIEN_AND_ROCKET_ICON_SIZE
@@ -223,7 +223,7 @@ function Galacta({ shouldDisplayGame }) {
       setLose(BREAK_THRU)
       setGameRunning(false)
     }
-  }
+  }, [activeAliens, loseSoundTwo, screenHeight])
 
   const processUserInput = useCallback(
     keyCode => {
@@ -301,7 +301,7 @@ function Galacta({ shouldDisplayGame }) {
     )
     crashWithAlienDetector()
     doesAlienBreakThru()
-  }, [activeAliens])
+  }, [activeAliens, crashWithAlienDetector, doesAlienBreakThru])
 
   useEffect(() => {
     processUserInput(pressedKey?.code)
