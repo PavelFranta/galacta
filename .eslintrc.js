@@ -14,5 +14,8 @@ module.exports = {
     sourceType: 'module'
   },
   plugins: ['react'],
-  rules: { 'space-before-function-paren': 0 }
+  rules: {
+    'space-before-function-paren': 0,
+    'react-hooks/exhaustive-deps': 'warn'
+  }
 }
