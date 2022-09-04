@@ -6,8 +6,8 @@ import GameMenu from './pages/game-menu'
 
 function App() {
   const [displayGame, setDisplayGame] = useState(false)
-  const [themeMenuMusic, { stop }] = useSound(
-    'sounds/music/theme-menu-music.mp3'
+  const [menuThemeMusic, { stop }] = useSound(
+    'sounds/music/menu-theme-music.mp3'
   )
 
   const shouldDisplayGame = value => {
@@ -17,10 +17,9 @@ function App() {
   useEffect(() => {
     if (displayGame) {
       stop()
-    } else {
-      themeMenuMusic()
     }
   }, [displayGame])
+  menuThemeMusic()
 
   return (
     <>
