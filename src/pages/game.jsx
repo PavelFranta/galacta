@@ -42,10 +42,38 @@ function Galacta({ shouldDisplayGame }) {
   const [levelThreeMusic, { stop: levelThreeMusicStop }] = useSound(
     'sounds/music/level-three-music.mp3'
   )
+  const [levelFourMusic, { stop: levelFourMusicStop }] = useSound(
+    'sounds/music/level-four-music.mp3'
+  )
+  const [levelFiveMusic, { stop: levelFiveMusicStop }] = useSound(
+    'sounds/music/level-five-music.mp3'
+  )
+  const [levelSixMusic, { stop: levelSixMusicStop }] = useSound(
+    'sounds/music/level-six-music.mp3'
+  )
+  const [levelSevenMusic, { stop: levelSevenMusicStop }] = useSound(
+    'sounds/music/level-seven-music.mp3'
+  )
 
   const musicStackForLevels = useCallback(
-    () => [levelOneMusic, levelTwoMusic, levelThreeMusic],
-    [levelOneMusic, levelTwoMusic, levelThreeMusic]
+    () => [
+      levelOneMusic,
+      levelTwoMusic,
+      levelThreeMusic,
+      levelFourMusic,
+      levelFiveMusic,
+      levelSixMusic,
+      levelSevenMusic
+    ],
+    [
+      levelOneMusic,
+      levelTwoMusic,
+      levelThreeMusic,
+      levelFourMusic,
+      levelFiveMusic,
+      levelSixMusic,
+      levelSevenMusic
+    ]
   )
 
   const [screenHeight, screenWidth] = useWindowDimensions()
@@ -68,13 +96,25 @@ function Galacta({ shouldDisplayGame }) {
     levelOneMusicStop()
     levelTwoMusicStop()
     levelThreeMusicStop()
-  }, [levelOneMusicStop, levelTwoMusicStop, levelThreeMusicStop])
+    levelFourMusicStop()
+    levelFiveMusicStop()
+    levelSixMusicStop()
+    levelSevenMusicStop()
+  }, [
+    levelOneMusicStop,
+    levelTwoMusicStop,
+    levelThreeMusicStop,
+    levelFourMusicStop,
+    levelFiveMusicStop,
+    levelSixMusicStop,
+    levelSevenMusicStop
+  ])
 
   const restart = useCallback(() => {
     setActiveAliens(generateArmy(screenWidth, currentLevel))
     setShotsShot(0)
     setAliensKilled(0)
-    setCurrentLevel(1)
+    setCurrentLevel(currentLevel)
     setWin(false)
     setLose('')
     setPausedGame(false)
@@ -117,7 +157,7 @@ function Galacta({ shouldDisplayGame }) {
   useEffect(() => {
     if (!win && !lose && !pausedGame && gameRunning) {
       stopAllMusic()
-      musicStackForLevels()[currentLevel]()
+      musicStackForLevels()[currentLevel - 1]()
     } else {
       stopAllMusic()
     }
@@ -181,6 +221,9 @@ function Galacta({ shouldDisplayGame }) {
           if (activeAliens.length === 1) {
             winSound()
             setWin(true)
+            setTimeout(() => {
+              setCurrentLevel(() => currentLevel + 1)
+            }, 3000)
           }
         }
       })
@@ -195,7 +238,8 @@ function Galacta({ shouldDisplayGame }) {
     holyShitSound,
     killingSpreeSound,
     monsterKillSound,
-    winSound
+    winSound,
+    currentLevel
   ])
 
   const crashWithAlienDetector = useCallback(() => {
