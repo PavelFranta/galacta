@@ -80,7 +80,7 @@ function Galacta({ shouldDisplayGame }) {
     setPausedGame(false)
     goAheadCommanderSound()
     setGameRunning(true)
-  }, [])
+  }, [currentLevel, goAheadCommanderSound, screenWidth])
 
   useEffect(() => {
     if (!win && !lose && !pausedGame && gameRunning) {
@@ -104,11 +104,43 @@ function Galacta({ shouldDisplayGame }) {
 
   useEffect(() => {
     restart()
-  }, [])
+  }, [restart])
 
   const hasSuitableViewport = useCallback(() => {
     return screenWidth >= 580 && screenHeight >= 580
   }, [screenHeight, screenWidth])
+
+  const moveRight = useCallback(() => {
+    if (rocketPositionX + 20 + 60 < screenWidth) {
+      setRocketPositionX(rocketPositionX + 30)
+    }
+  }, [rocketPositionX, screenWidth])
+
+  const moveLeft = useCallback(() => {
+    if (rocketPositionX - 20 > 0) {
+      setRocketPositionX(rocketPositionX - 30)
+    }
+  }, [rocketPositionX])
+
+  const moveUp = useCallback(() => {
+    if (rocketPositionY - 20 > 0) {
+      setRocketPositionY(rocketPositionY - 30)
+    }
+  }, [rocketPositionY])
+  const moveDown = useCallback(() => {
+    if (rocketPositionY + 20 + ALIEN_AND_ROCKET_ICON_SIZE < screenHeight) {
+      setRocketPositionY(rocketPositionY + 30)
+    }
+  }, [rocketPositionY, screenHeight])
+
+  const fireNewShot = useCallback(() => {
+    setActiveShots([
+      ...activeShots,
+      { positionX: rocketPositionX + 30.5, positionY: rocketPositionY - 5 }
+    ])
+    setShotsShot(shotsShot + 1)
+    shotSound()
+  }, [activeShots, rocketPositionX, rocketPositionY, shotSound, shotsShot])
 
   const hitDetector = useCallback(() => {
     activeShots.forEach(shot => {
@@ -153,9 +185,20 @@ function Galacta({ shouldDisplayGame }) {
         }
       })
     })
-  })
+  }, [
+    activeAliens,
+    activeShots,
+    aliensKilled,
+    firstBloodSound,
+    godlikeSound,
+    hitSound,
+    holyShitSound,
+    killingSpreeSound,
+    monsterKillSound,
+    winSound
+  ])
 
-  const crashWithAlienDetector = () => {
+  const crashWithAlienDetector = useCallback(() => {
     activeAliens.forEach(alien => {
       if (
         rocketPositionX >= alien.positionX &&
@@ -168,9 +211,9 @@ function Galacta({ shouldDisplayGame }) {
         setGameRunning(false)
       }
     })
-  }
+  }, [activeAliens, loseSoundThree, rocketPositionX, rocketPositionY])
 
-  const doesAlienBreakThru = () => {
+  const doesAlienBreakThru = useCallback(() => {
     if (
       activeAliens.some(
         alien => alien.positionY > screenHeight - ALIEN_AND_ROCKET_ICON_SIZE
@@ -180,74 +223,57 @@ function Galacta({ shouldDisplayGame }) {
       setLose(BREAK_THRU)
       setGameRunning(false)
     }
-  }
+  }, [activeAliens, loseSoundTwo, screenHeight])
 
-  const processUserInput = useCallback(keyCode => {
-    if (
-      (!pausedGame && !win && !lose) ||
-      (pausedGame && keyCode === 'Escape') ||
-      ((win || lose) && keyCode === 'Enter')
-    ) {
-      switch (keyCode) {
-        case 'ArrowRight':
-          moveRight()
-          break
-        case 'ArrowLeft':
-          moveLeft()
-          break
-        case 'ArrowUp':
-          moveUp()
-          break
-        case 'ArrowDown':
-          moveDown()
-          break
-        case 'Space':
-          fireNewShot()
-          break
-        case 'Escape':
-          setPausedGame(!pausedGame)
-          break
-        case 'Enter':
-        case 'NumpadEnter':
-          if (win || lose) {
-            restart()
-          }
-          break
-        default:
-          break
+  const processUserInput = useCallback(
+    keyCode => {
+      if (
+        (!pausedGame && !win && !lose) ||
+        (pausedGame && keyCode === 'Escape') ||
+        ((win || lose) && keyCode === 'Enter')
+      ) {
+        switch (keyCode) {
+          case 'ArrowRight':
+            moveRight()
+            break
+          case 'ArrowLeft':
+            moveLeft()
+            break
+          case 'ArrowUp':
+            moveUp()
+            break
+          case 'ArrowDown':
+            moveDown()
+            break
+          case 'Space':
+            fireNewShot()
+            break
+          case 'Escape':
+            setPausedGame(!pausedGame)
+            break
+          case 'Enter':
+          case 'NumpadEnter':
+            if (win || lose) {
+              restart()
+            }
+            break
+          default:
+            break
+        }
       }
-    }
-  })
-
-  const moveRight = () => {
-    if (rocketPositionX + 20 + 60 < screenWidth) {
-      setRocketPositionX(rocketPositionX + 30)
-    }
-  }
-  const moveLeft = () => {
-    if (rocketPositionX - 20 > 0) {
-      setRocketPositionX(rocketPositionX - 30)
-    }
-  }
-  const moveUp = () => {
-    if (rocketPositionY - 20 > 0) {
-      setRocketPositionY(rocketPositionY - 30)
-    }
-  }
-  const moveDown = () => {
-    if (rocketPositionY + 20 + ALIEN_AND_ROCKET_ICON_SIZE < screenHeight) {
-      setRocketPositionY(rocketPositionY + 30)
-    }
-  }
-
-  const fireNewShot = () => {
-    setActiveShots([
-      ...activeShots,
-      { positionX: rocketPositionX + 30.5, positionY: rocketPositionY - 5 }
-    ])
-    setShotsShot(shotsShot + 1)
-    shotSound()
-  }
+    },
+    [
+      fireNewShot,
+      lose,
+      moveDown,
+      moveLeft,
+      moveRight,
+      moveUp,
+      pausedGame,
+      restart,
+      win
+    ]
+  )
 
   const shotsMoverMapping = useCallback(() => {
     setActiveShots(
@@ -275,7 +301,7 @@ function Galacta({ shouldDisplayGame }) {
     )
     crashWithAlienDetector()
     doesAlienBreakThru()
-  }, [activeAliens])
+  }, [activeAliens, crashWithAlienDetector, doesAlienBreakThru])
 
   useEffect(() => {
     processUserInput(pressedKey?.code)
