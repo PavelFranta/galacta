@@ -13,9 +13,8 @@ import useWindowDimensions from '../hooks/windowDimensions'
 
 import generateArmy from '../generators/aliensArmy'
 
+export const ALIEN_AND_ROCKET_ICON_SIZE = 64
 function Galacta({ shouldDisplayGame }) {
-  const ALIEN_AND_ROCKET_ICON_SIZE = 64
-
   const [shotSound] = useSound('shot.wav')
   const [hitSound] = useSound('hit.wav')
   const [winSound] = useSound('win.mp3', { volume: 1.5 })
