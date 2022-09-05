@@ -45,7 +45,7 @@ const GameMenu = ({ shouldDisplayGame }) => {
           ＥＸＩＴ
         </a>
       </div>
-      <span className="mt-4">v0.3.1 - 4.9.2022</span>
+      <span className="mt-4">v0.3.2 - 5.9.2022</span>
     </div>
   )
 }

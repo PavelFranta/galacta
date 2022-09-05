@@ -29,8 +29,34 @@ function Galacta({ shouldDisplayGame }) {
   const [killingSpreeSound] = useSound('sounds/talks/killing-spree.mp3')
   const [firstBloodSound] = useSound('sounds/talks/first-blood.mp3')
   const [holyShitSound] = useSound('sounds/talks/holy-shit.mp3')
-  const [goAheadCommanderSound] = useSound(
-    'sounds/talks/go-ahead-commander.mp3'
+
+  const [startRocketOne] = useSound('sounds/talks/start-rocket-one.mp3')
+  const [startRocketTwo] = useSound('sounds/talks/start-rocket-two.mp3')
+  const [startRocketThree] = useSound('sounds/talks/start-rocket-three.mp3')
+  const [startRocketFour] = useSound('sounds/talks/start-rocket-four.mp3')
+  const [startRocketFive] = useSound('sounds/talks/start-rocket-five.mp3')
+  const [startRocketSix] = useSound('sounds/talks/start-rocket-six.mp3')
+  const [startRocketSeven] = useSound('sounds/talks/start-rocket-seven.mp3')
+
+  const startRocketCryForLevels = useCallback(
+    () => [
+      startRocketOne,
+      startRocketTwo,
+      startRocketThree,
+      startRocketFour,
+      startRocketFive,
+      startRocketSix,
+      startRocketSeven
+    ],
+    [
+      startRocketFive,
+      startRocketFour,
+      startRocketOne,
+      startRocketSeven,
+      startRocketSix,
+      startRocketThree,
+      startRocketTwo
+    ]
   )
 
   const [levelOneMusic, { stop: levelOneMusicStop }] = useSound(
@@ -118,9 +144,9 @@ function Galacta({ shouldDisplayGame }) {
     setWin(false)
     setLose('')
     setPausedGame(false)
-    goAheadCommanderSound()
+    startRocketCryForLevels()[currentLevel - 1]()
     setGameRunning(true)
-  }, [currentLevel, goAheadCommanderSound, screenWidth])
+  }, [currentLevel, screenWidth, startRocketCryForLevels])
 
   const moveRight = useCallback(() => {
     if (rocketPositionX + 20 + 60 < screenWidth) {
@@ -389,7 +415,7 @@ function Galacta({ shouldDisplayGame }) {
                 shotsShot={shotsShot}
                 restart={restart}
                 shouldDisplayGame={shouldDisplayGame}
-                totalWin={currentLevel === 7}
+                level={currentLevel}
               />
             )}
             {lose && (
@@ -429,7 +455,11 @@ function Galacta({ shouldDisplayGame }) {
             />
           ))}
           {!win && (
-            <InGameScore aliensKilled={aliensKilled} shotsShot={shotsShot} />
+            <InGameScore
+              aliensKilled={aliensKilled}
+              shotsShot={shotsShot}
+              level={currentLevel}
+            />
           )}
         </div>
       )}

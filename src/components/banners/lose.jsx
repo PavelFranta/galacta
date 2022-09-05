@@ -13,7 +13,7 @@ const Lose = ({
 }) => {
   return (
     <div className="text-white flex flex-col p-4 text-xl items-center gap-4 border z-20 relative bg-slate-900 border-white w-fit mx-auto">
-      <div className="text-8xl p-4">
+      <div className="text-2xl md:text-8xl p-4">
         {reason === CRASH ? 'LAMA SE SRAZILA' : 'DOSTALI TE'}
       </div>
       <div>Score: {aliensKilled}</div>
