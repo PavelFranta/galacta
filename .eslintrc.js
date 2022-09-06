@@ -16,6 +16,6 @@ module.exports = {
   plugins: ['react'],
   rules: {
     'space-before-function-paren': 0,
-    'react-hooks/exhaustive-deps': 1
+    'react-hooks/exhaustive-deps': 0
   }
 }
