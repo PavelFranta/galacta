@@ -56,7 +56,9 @@ function Galacta({ shouldDisplayGame }) {
   const pressedKey = useKeyboardReader()
 
   const restart = useCallback(() => {
-    setActiveAliens(generateArmy(screenWidth, currentLevel))
+    if (hasSuitableViewport) {
+      setActiveAliens(generateArmy(screenWidth, currentLevel))
+    }
     setShotsShot(0)
     setAliensKilled(0)
     setCurrentLevel(currentLevel)
